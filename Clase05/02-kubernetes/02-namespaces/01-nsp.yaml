@@ -1,0 +1,161 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: nsp-dev
+  labels:
+    env: dev
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: nsp-prd
+  labels:
+    env: prd
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deploy-frontend-dev
+  namespace: nsp-dev
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: frontend
+      env: dev
+  template:
+    metadata:
+      labels:
+        app: frontend
+        env: dev
+    spec:
+      containers:
+        - name: container01
+          image: nginx:alpine
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deploy-frontend-prd
+  namespace: nsp-prd
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      app: frontend
+      env: prd
+  template:
+    metadata:
+      labels:
+        app: frontend
+        env: prd
+    spec:
+      containers:
+        - name: container01
+          image: nginx:alpine
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-dev-svc
+  namespace: nsp-dev
+spec:
+  type: ClusterIP
+  selector:
+    app: frontend
+    env: dev
+  ports:
+    - port: 9000
+      targetPort: 80
+      protocol: TCP
+      name: port-web
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-prd-svc
+  namespace: nsp-prd
+spec:
+  type: ClusterIP
+  selector:
+    app: frontend
+    env: prd
+  ports:
+    - port: 9000
+      targetPort: 80
+      protocol: TCP
+      name: port-web
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deploy-backend-dev
+  namespace: nsp-dev
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: backend
+      env: dev
+  template:
+    metadata:
+      labels:
+        app: backend
+        env: dev
+    spec:
+      containers:
+        - name: container01
+          image: nginx:alpine
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deploy-backend-prd
+  namespace: nsp-prd
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: backend
+      env: prd
+  template:
+    metadata:
+      labels:
+        app: backend
+        env: prd
+    spec:
+      containers:
+        - name: container01
+          image: nginx:alpine
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-dev-svc
+  namespace: nsp-dev
+spec:
+  type: ClusterIP
+  selector:
+    app: backend
+    env: dev
+  ports:
+    - port: 9000
+      targetPort: 80
+      protocol: TCP
+      name: port-web
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-prd-svc
+  namespace: nsp-prd
+spec:
+  type: ClusterIP
+  selector:
+    app: backend
+    env: prd
+  ports:
+    - port: 9000
+      targetPort: 80
+      protocol: TCP
+      name: port-web

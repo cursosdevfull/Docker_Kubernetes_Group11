@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deploy-frontend
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+        - name: container01
+          image: nginx:alpine
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-svc
+spec:
+  type: NodePort
+  selector:
+    app: frontend
+  ports:
+    - nodePort: 30010
+      port: 9000
+      targetPort: 80
+      protocol: TCP
+      name: port-web
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deploy-backend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: container01
+          image: nginx:alpine
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-svc
+spec:
+  type: NodePort
+  selector:
+    app: backend
+  ports:
+    - nodePort: 30020
+      port: 9000
+      targetPort: 80
+      protocol: TCP
+      name: port-web

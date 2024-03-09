@@ -1,0 +1,45 @@
+version: "3.8"
+
+services:
+  mysql-server:
+    image: mysql:8
+    container_name: mysql-server
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: test
+      MYSQL_USER: test
+      MYSQL_PASSWORD: test
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 3s
+      retries: 3
+      start_period: 8s
+      timeout: 10s
+
+  nginx-server:
+    image: nginx:alpine
+    container_name: nginx-server
+    ports:
+      - "80:80"
+    depends_on:
+      mysql-server:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost"] # curl --fail http://localhost
+      #test: ["CMD", "ping", "localhost"] # ping localhost
+      interval: 3s
+      retries: 3
+      start_period: 8s
+      timeout: 10s
+
+  busybox:
+    image: busybox
+    container_name: busybox
+    command: ["sh", "-c", "while :; do sleep 10; done"]
+    depends_on:
+      mysql-server:
+        condition: service_healthy
+      nginx-server:
+        condition: service_healthy

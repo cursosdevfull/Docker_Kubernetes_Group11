@@ -1,0 +1,48 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: parameters-connection
+data:
+  db_host: dev.host.local
+  db_port: "4500"
+  db_user: shidalgo
+  db_pass: "12345"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deploy-frontend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      env: dev
+  template:
+    metadata:
+      labels:
+        env: dev
+    spec:
+      containers:
+        - name: server-web
+          image: nginx:alpine
+          env:
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: parameters-connection
+                  key: db_host
+            - name: DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: parameters-connection
+                  key: db_port
+            - name: DB_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: parameters-connection
+                  key: db_user
+            - name: DB_PASS
+              valueFrom:
+                configMapKeyRef:
+                  name: parameters-connection
+                  key: db_pass
