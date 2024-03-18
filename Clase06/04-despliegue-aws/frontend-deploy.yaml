@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: frontend-app
+      env: dev
+  template:
+    metadata:
+      labels:
+        app: frontend-app
+        env: dev
+    spec:
+      containers:
+        - name: frontend-container
+          image: 282865065290.dkr.ecr.us-east-1.amazonaws.com/frontend
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3000
+          env:
+            - name: PORT
+              value: "3000"
+            - name: SERVICE_BACKEND1
+              value: "api/message"
+          livenessProbe:
+            httpGet:
+              path: "/healthcheck"
+              port: 3000
+            initialDelaySeconds: 2
+            periodSeconds: 3
+          resources:
+            limits:
+              memory: "200Mi"
+              cpu: "0.5"
+            requests:
+              memory: "128Mi"
+              cpu: "0.25"

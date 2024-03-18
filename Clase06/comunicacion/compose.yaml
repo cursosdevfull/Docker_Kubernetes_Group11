@@ -1,0 +1,90 @@
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    image: frontend-ms
+    container_name: frontend-ms
+    ports:
+      - "4000:3000"
+    environment:
+      - PORT=3000
+      - SERVICE_BACKEND1=http://localhost:4010/api/message
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/healthcheck"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: "0.50"
+          memory: 50M
+        reservations:
+          cpus: "0.25"
+          memory: 20M
+    networks:
+      - net-app01
+
+  backend1:
+    build:
+      context: ./backend1
+      dockerfile: Dockerfile
+    image: backend1-ms
+    container_name: backend1-ms
+    ports:
+      - "4010:3010"
+    environment:
+      - PORT=3010
+      - SERVICE_BACKEND2=http://backend2:3020/api/message
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3010/healthcheck"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: "0.50"
+          memory: 50M
+        reservations:
+          cpus: "0.25"
+          memory: 20M
+    networks:
+      - net-app01
+      - net-app02
+
+  backend2:
+    build:
+      context: ./backend2
+      dockerfile: Dockerfile
+    image: backend2-ms
+    container_name: backend2-ms
+    environment:
+      - PORT=3020
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3020/healthcheck"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: "0.50"
+          memory: 50M
+        reservations:
+          cpus: "0.25"
+          memory: 20M
+    networks:
+      - net-app02
+
+networks:
+  net-app01:
+    name: net-app01
+    driver: bridge
+  net-app02:
+    name: net-app02
+    driver: bridge
