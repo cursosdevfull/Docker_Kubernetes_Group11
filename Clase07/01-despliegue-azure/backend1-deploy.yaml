@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend1-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: backend1-app
+      env: dev
+  template:
+    metadata:
+      labels:
+        app: backend1-app
+        env: dev
+    spec:
+      containers:
+        - name: backend1-container
+          image: grupodocker11.azurecr.io/backend1
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3010
+          env:
+            - name: PORT
+              value: "3010"
+            - name: SERVICE_BACKEND2
+              value: "http://backend2-svc/api/message"
+          livenessProbe:
+            httpGet:
+              path: "/healthcheck"
+              port: 3010
+            initialDelaySeconds: 2
+            periodSeconds: 3
+          resources:
+            limits:
+              memory: "200Mi"
+              cpu: "0.5"
+            requests:
+              memory: "64Mi"
+              cpu: "0.10"

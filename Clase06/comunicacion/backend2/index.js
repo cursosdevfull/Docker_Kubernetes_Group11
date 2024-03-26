@@ -5,6 +5,10 @@ const app = express();
 
 app.use(cors());
 
+app.get("/", (req, res) => {
+  res.send("ok");
+});
+
 app.get("/healthcheck", (req, res) => {
   res.send("ok");
 });
